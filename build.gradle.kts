@@ -20,6 +20,9 @@ repositories {
 
 dependencies {
     compile(kotlin("stdlib-jdk8", kotlinVersion))
+    compile("com.squareup.retrofit2:retrofit:2.3.0")
+
+    testCompile("com.squareup.okhttp3:mockwebserver:3.9.1")
 }
 
 tasks.withType<KotlinCompile> {
