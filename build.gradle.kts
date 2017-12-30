@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.2.10"
+    id("org.mikeneck.junit.starter.normal") version "5.0.2"
 }
 
 val kotlinVersion: String? by extra {
