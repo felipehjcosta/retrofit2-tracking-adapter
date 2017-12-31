@@ -15,42 +15,53 @@ class TrackingCallAdapterFactory private constructor(
     }
 
     override fun get(returnType: Type?, annotations: Array<out Annotation>?, retrofit: Retrofit?): CallAdapter<*, *>? {
-
-        if (Call::class.java != getRawType(returnType!!)) {
-            return null
+        return if (isCallType(returnType!!)) {
+            createCallAdapter(returnType, annotations, retrofit)
+        } else {
+            null
         }
+    }
 
+    private fun isCallType(type: Type) = Call::class.java == getRawType(type)
+
+    private fun createCallAdapter(returnType: Type?, annotations: Array<out Annotation>?, retrofit: Retrofit?): CallAdapter<*, *> {
         val responseType = getParameterUpperBound(0, returnType as ParameterizedType)
+        return TrackingCallAdapter(responseType, createTracking())
+    }
 
-        return object : CallAdapter<Any, Any> {
+    private class TrackingCallAdapter(
+            private val responseType: Type,
+            private val retrofitNetworkTracking: RetrofitNetworkTracking
 
-            override fun responseType(): Type? = responseType
+    ) : CallAdapter<Any, Any> {
+        override fun responseType(): Type = responseType
 
-            override fun adapt(call: Call<Any>?): Any = TrackingCallDecorator(call!!, createTracking)
-        }
+        override fun adapt(call: Call<Any>?): Any = TrackingCallDecorator(call!!, retrofitNetworkTracking)
     }
 
     private class TrackingCallDecorator(
             private val decoratedCall: Call<Any>,
-            private val createTracking: () -> RetrofitNetworkTracking
+            private val retrofitNetworkTracking: RetrofitNetworkTracking
     ) : Call<Any> by decoratedCall {
 
-        override fun execute(): Response<Any> = try {
-            decoratedCall.execute().apply { createTracking().onSuccess(this) }
-        } catch (e: Exception) {
-            createTracking().onFailure(e)
-            throw e
+        override fun execute(): Response<Any> {
+            return try {
+                decoratedCall.execute().apply { retrofitNetworkTracking.onSuccess(this) }
+            } catch (e: Exception) {
+                retrofitNetworkTracking.onFailure(e)
+                throw e
+            }
         }
 
         override fun enqueue(callback: Callback<Any>?) {
             decoratedCall.enqueue(object : Callback<Any> {
                 override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
-                    createTracking().onSuccess(response as Response<*>)
+                    retrofitNetworkTracking.onSuccess(response as Response<*>)
                     callback!!.onResponse(call!!, response)
                 }
 
                 override fun onFailure(call: Call<Any>?, t: Throwable?) {
-                    createTracking().onFailure(t!!)
+                    retrofitNetworkTracking.onFailure(t!!)
                     callback!!.onFailure(call!!, t)
                 }
             })
