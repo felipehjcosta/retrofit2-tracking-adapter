@@ -23,6 +23,8 @@ dependencies {
     compile("com.squareup.retrofit2:retrofit:2.3.0")
 
     testCompile("com.squareup.okhttp3:mockwebserver:3.9.1")
+    testCompile("com.google.guava:guava:23.6-jre")
+    testCompile("io.mockk:mockk:1.6")
 }
 
 tasks.withType<KotlinCompile> {
