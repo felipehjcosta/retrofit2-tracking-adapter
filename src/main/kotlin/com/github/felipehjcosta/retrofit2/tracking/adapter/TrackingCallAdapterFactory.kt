@@ -66,5 +66,7 @@ class TrackingCallAdapterFactory private constructor(
                 }
             })
         }
+
+        override fun clone(): Call<Any> = TrackingCallDecorator(decoratedCall.clone(), retrofitNetworkTracking)
     }
 }
