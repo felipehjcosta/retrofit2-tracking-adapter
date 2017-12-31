@@ -1,9 +1,6 @@
 package com.github.felipehjcosta.retrofit2.tracking.adapter
 
-import retrofit2.Call
-import retrofit2.CallAdapter
-import retrofit2.Response
-import retrofit2.Retrofit
+import retrofit2.*
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -43,6 +40,20 @@ class TrackingCallAdapterFactory private constructor(
         } catch (e: Exception) {
             createTracking().onFailure(e)
             throw e
+        }
+
+        override fun enqueue(callback: Callback<Any>?) {
+            decoratedCall.enqueue(object : Callback<Any> {
+                override fun onResponse(call: Call<Any>?, response: Response<Any>?) {
+                    createTracking().onSuccess(response as Response<*>)
+                    callback!!.onResponse(call!!, response)
+                }
+
+                override fun onFailure(call: Call<Any>?, t: Throwable?) {
+                    createTracking().onFailure(t!!)
+                    callback!!.onFailure(call!!, t)
+                }
+            })
         }
     }
 }

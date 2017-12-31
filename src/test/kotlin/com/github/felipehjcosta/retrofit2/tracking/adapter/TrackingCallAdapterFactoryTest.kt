@@ -3,6 +3,7 @@ package com.github.felipehjcosta.retrofit2.tracking.adapter
 import com.google.common.reflect.TypeToken
 import io.mockk.mockk
 import io.mockk.verify
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
@@ -10,14 +11,20 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import java.lang.reflect.Type
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 
 class TrackingCallAdapterFactoryTest {
 
     companion object {
         private val NO_ANNOTATIONS = emptyArray<Annotation>()
+
+        private const val timeoutOfAsyncTestsInMillis = 2_000L
     }
 
     private val server = MockWebServer()
@@ -31,8 +38,13 @@ class TrackingCallAdapterFactoryTest {
     @BeforeEach
     internal fun setUp() {
         server.start()
+        val okHttpClient = OkHttpClient.Builder()
+                .readTimeout(500, MILLISECONDS)
+                .connectTimeout(500, MILLISECONDS)
+                .build()
         retrofit = Retrofit.Builder()
                 .baseUrl(server.url("/"))
+                .client(okHttpClient)
                 .addConverterFactory(StringConverterFactory())
                 .addCallAdapterFactory(factory)
                 .build()
@@ -55,7 +67,7 @@ class TrackingCallAdapterFactoryTest {
     }
 
     @Test
-    internal fun whenMakeARequestWithSuccessItShouldTrackSuccess() {
+    internal fun whenMakeRequestWithSuccessItShouldTrackSuccess() {
         server.enqueue(MockResponse().setBody(""))
 
         val call = retrofit.create(Endpoint::class.java).get()
@@ -66,10 +78,54 @@ class TrackingCallAdapterFactoryTest {
     }
 
     @Test
-    internal fun whenMakeARequestWithErrorItShouldTrackFailure() {
+    internal fun whenMakeRequestWithErrorItShouldTrackFailure() {
         val call = retrofit.create(Endpoint::class.java).get()
 
         assertThrows(Exception::class.java) { call.execute() }
+
+        verify { mockRetrofitNetworkTracking.onFailure(any()) }
+    }
+
+    @Test
+    internal fun whenEnqueueRequestWithSuccessItShouldTrackSuccess() {
+        server.enqueue(MockResponse().setBody(""))
+
+        val call = retrofit.create(Endpoint::class.java).get()
+
+        val semaphore = CountDownLatch(1)
+        call.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>?, response: Response<String>?) {
+                semaphore.countDown()
+            }
+
+            override fun onFailure(call: Call<String>?, t: Throwable?) {
+                semaphore.countDown()
+                fail<String>("It should not have passed here.")
+            }
+        })
+
+        semaphore.await(timeoutOfAsyncTestsInMillis, MILLISECONDS)
+
+        verify { mockRetrofitNetworkTracking.onSuccess(any()) }
+    }
+
+    @Test
+    internal fun whenEnqueueRequestWithErrorItShouldTrackFailure() {
+        val call = retrofit.create(Endpoint::class.java).get()
+
+        val semaphore = CountDownLatch(1)
+        call.enqueue(object : Callback<String> {
+            override fun onResponse(call: Call<String>?, response: Response<String>?) {
+                semaphore.countDown()
+                fail<String>("It should not have passed here.")
+            }
+
+            override fun onFailure(call: Call<String>?, t: Throwable?) {
+                semaphore.countDown()
+            }
+        })
+
+        semaphore.await(timeoutOfAsyncTestsInMillis, MILLISECONDS)
 
         verify { mockRetrofitNetworkTracking.onFailure(any()) }
     }
