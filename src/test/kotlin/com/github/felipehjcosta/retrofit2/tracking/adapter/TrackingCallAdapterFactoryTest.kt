@@ -25,6 +25,8 @@ class TrackingCallAdapterFactoryTest {
         private val NO_ANNOTATIONS = emptyArray<Annotation>()
 
         private const val timeoutOfAsyncTestsInMillis = 2_000L
+
+        private const val trackingpath = "/test/{id}"
     }
 
     private val server = MockWebServer()
@@ -74,7 +76,7 @@ class TrackingCallAdapterFactoryTest {
 
         call.execute()
 
-        verify { mockRetrofitNetworkTracking.onSuccess(any()) }
+        verify { mockRetrofitNetworkTracking.onSuccess(any(), trackingpath) }
     }
 
     @Test
@@ -83,7 +85,7 @@ class TrackingCallAdapterFactoryTest {
 
         assertThrows(Exception::class.java) { call.execute() }
 
-        verify { mockRetrofitNetworkTracking.onFailure(any()) }
+        verify { mockRetrofitNetworkTracking.onFailure(any(), trackingpath) }
     }
 
     @Test
@@ -106,7 +108,7 @@ class TrackingCallAdapterFactoryTest {
 
         semaphore.await(timeoutOfAsyncTestsInMillis, MILLISECONDS)
 
-        verify { mockRetrofitNetworkTracking.onSuccess(any()) }
+        verify { mockRetrofitNetworkTracking.onSuccess(any(), trackingpath) }
     }
 
     @Test
@@ -127,7 +129,7 @@ class TrackingCallAdapterFactoryTest {
 
         semaphore.await(timeoutOfAsyncTestsInMillis, MILLISECONDS)
 
-        verify { mockRetrofitNetworkTracking.onFailure(any()) }
+        verify { mockRetrofitNetworkTracking.onFailure(any(), trackingpath) }
     }
 
     private inline fun <reified T : Any> typeOf(): Type = object : TypeToken<T>() {}.type
