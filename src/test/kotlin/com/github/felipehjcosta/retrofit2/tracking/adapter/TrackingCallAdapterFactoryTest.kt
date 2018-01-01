@@ -24,10 +24,10 @@ class TrackingCallAdapterFactoryTest {
     companion object {
         private val NO_ANNOTATIONS = emptyArray<Annotation>()
 
-        private const val timeoutOfAsyncTestsInMillis = 2_000L
-
-        private const val trackingpath = "/test/{id}"
+        private const val TIMEOUT_OF_ASYNC_TESTS_IN_MILLIS = 2_000L
     }
+
+    private val expectedTrackingPath = "/test/{id}"
 
     private val server = MockWebServer()
 
@@ -74,18 +74,18 @@ class TrackingCallAdapterFactoryTest {
 
         val call = retrofit.create(Endpoint::class.java).get()
 
-        call.execute()
+        val expectedResponse = call.execute()
 
-        verify { mockRetrofitNetworkTracking.onSuccess(any(), trackingpath) }
+        verify { mockRetrofitNetworkTracking.onSuccess(expectedResponse, expectedTrackingPath) }
     }
 
     @Test
     internal fun whenMakeRequestWithErrorItShouldTrackFailure() {
         val call = retrofit.create(Endpoint::class.java).get()
 
-        assertThrows(Exception::class.java) { call.execute() }
+        val expectedThrowable = assertThrows(Exception::class.java) { call.execute() }
 
-        verify { mockRetrofitNetworkTracking.onFailure(any(), trackingpath) }
+        verify { mockRetrofitNetworkTracking.onFailure(expectedThrowable, expectedTrackingPath) }
     }
 
     @Test
@@ -94,9 +94,11 @@ class TrackingCallAdapterFactoryTest {
 
         val call = retrofit.create(Endpoint::class.java).get()
 
+        var expectedResponse: Response<*>? = null
         val semaphore = CountDownLatch(1)
         call.enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>?, response: Response<String>?) {
+                expectedResponse = response as Response<*>
                 semaphore.countDown()
             }
 
@@ -106,15 +108,16 @@ class TrackingCallAdapterFactoryTest {
             }
         })
 
-        semaphore.await(timeoutOfAsyncTestsInMillis, MILLISECONDS)
+        semaphore.await(TIMEOUT_OF_ASYNC_TESTS_IN_MILLIS, MILLISECONDS)
 
-        verify { mockRetrofitNetworkTracking.onSuccess(any(), trackingpath) }
+        verify { mockRetrofitNetworkTracking.onSuccess(expectedResponse!!, expectedTrackingPath) }
     }
 
     @Test
     internal fun whenEnqueueRequestWithErrorItShouldTrackFailure() {
         val call = retrofit.create(Endpoint::class.java).get()
 
+        var expectedThrowable: Throwable? = null
         val semaphore = CountDownLatch(1)
         call.enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>?, response: Response<String>?) {
@@ -123,13 +126,14 @@ class TrackingCallAdapterFactoryTest {
             }
 
             override fun onFailure(call: Call<String>?, t: Throwable?) {
+                expectedThrowable = t
                 semaphore.countDown()
             }
         })
 
-        semaphore.await(timeoutOfAsyncTestsInMillis, MILLISECONDS)
+        semaphore.await(TIMEOUT_OF_ASYNC_TESTS_IN_MILLIS, MILLISECONDS)
 
-        verify { mockRetrofitNetworkTracking.onFailure(any(), trackingpath) }
+        verify { mockRetrofitNetworkTracking.onFailure(expectedThrowable!!, expectedTrackingPath) }
     }
 
     private inline fun <reified T : Any> typeOf(): Type = object : TypeToken<T>() {}.type
