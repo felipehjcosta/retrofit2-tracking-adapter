@@ -26,7 +26,7 @@ class TrackingCallAdapterFactory private constructor(
 
     private fun createCallAdapter(returnType: Type?, annotations: Array<out Annotation>?): CallAdapter<*, *> {
         val responseType = getParameterUpperBound(0, returnType as ParameterizedType)
-        val path = annotations?.filterIsInstance<RetrofitTracking>()?.firstOrNull()?.path
+        val path = annotations?.filterIsInstance<Tracking>()?.firstOrNull()?.path
 
         return TrackingCallAdapter(responseType, createTracking(), path)
     }

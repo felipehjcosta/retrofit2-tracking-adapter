@@ -6,6 +6,6 @@ import retrofit2.http.GET
 interface Endpoint {
 
     @GET("/test/1")
-    @RetrofitTracking("/test/{id}")
+    @Tracking("/test/{id}")
     fun get(): Call<String>
 }

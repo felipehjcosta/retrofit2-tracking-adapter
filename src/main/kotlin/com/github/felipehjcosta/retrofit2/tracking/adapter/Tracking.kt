@@ -3,4 +3,4 @@ package com.github.felipehjcosta.retrofit2.tracking.adapter
 @Retention
 @Target(AnnotationTarget.FUNCTION)
 @MustBeDocumented
-annotation class RetrofitTracking(val path: String)
+annotation class Tracking(val path: String)
