@@ -1,12 +1,13 @@
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getValue
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
+import com.novoda.gradle.release.PublishExtension
 
 plugins {
     kotlin("jvm") version "1.2.10"
     id("org.mikeneck.junit.starter.normal") version "5.0.2"
     jacoco
+    id("com.novoda.bintray-release") version "0.8.0"
 }
 
 val kotlinVersion: String? by extra {
@@ -37,6 +38,15 @@ tasks.withType<JacocoReport> {
         xml.isEnabled = true
         html.isEnabled = true
     }
+}
+
+configure<PublishExtension> {
+    userOrg = "fcostaa"
+    groupId = "com.github.felipehjcosta"
+    artifactId = "retrofit2-tracking-adapter"
+    publishVersion = "1.0.0-SNAPSHOT"
+    desc = "A Retrofit 2 adapter for tracking responses"
+    website = "https://github.com/felipehjcosta/retrofit2-tracking-adapter"
 }
 
 afterEvaluate {
