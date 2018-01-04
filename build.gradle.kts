@@ -33,6 +33,13 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+tasks.withType<JacocoReport> {
+    reports {
+        xml.isEnabled = true
+        html.isEnabled = true
+    }
+}
+
 configure<PublishExtension> {
     userOrg = "fcostaa"
     groupId = "com.github.felipehjcosta"
