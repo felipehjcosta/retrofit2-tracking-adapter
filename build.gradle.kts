@@ -37,7 +37,7 @@ configure<PublishExtension> {
     userOrg = "fcostaa"
     groupId = "com.github.felipehjcosta"
     artifactId = "retrofit2-tracking-adapter"
-    publishVersion = "1.0.0-SNAPSHOT"
+    publishVersion = "0.9.0"
     desc = "A Retrofit 2 adapter for tracking responses"
     website = "https://github.com/felipehjcosta/retrofit2-tracking-adapter"
 }
