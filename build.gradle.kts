@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.novoda.gradle.release.PublishExtension
 
 plugins {
-    kotlin("jvm") version "1.2.10"
+    kotlin("jvm") version "1.2.21"
     id("org.mikeneck.junit.starter.normal") version "5.0.2"
     jacoco
     id("com.novoda.bintray-release") version "0.8.0"
