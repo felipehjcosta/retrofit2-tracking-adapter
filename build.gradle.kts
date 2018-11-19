@@ -56,8 +56,8 @@ afterEvaluate {
     }
     task<JacocoReport>("jacocoJunit5TestReport") {
         executionData(junitPlatformTest)
-        sourceSets(java.sourceSets["main"])
-        sourceDirectories = files(java.sourceSets["main"].allSource.srcDirs)
-        classDirectories = files(java.sourceSets["main"].output)
+        sourceSets(project.sourceSets["main"])
+        sourceDirectories = files(project.sourceSets["main"].allSource.srcDirs)
+        classDirectories = files(project.sourceSets["main"].output)
     }
 }
