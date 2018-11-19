@@ -26,7 +26,7 @@ dependencies {
 
     testCompile("com.squareup.okhttp3:mockwebserver:3.12.0")
     testCompile("com.google.guava:guava:23.6-jre")
-    testCompile("io.mockk:mockk:1.6")
+    testCompile("io.mockk:mockk:1.8.13.kotlin13")
 }
 
 tasks.withType<KotlinCompile> {
