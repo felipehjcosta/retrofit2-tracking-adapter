@@ -7,7 +7,7 @@ plugins {
     kotlin("jvm") version "1.3.10"
     id("org.mikeneck.junit.starter.normal") version "5.0.2"
     jacoco
-    id("com.novoda.bintray-release") version "0.9.0"
+    id("com.novoda.bintray-release") version "0.9"
 }
 
 val kotlinVersion: String? by extra {
