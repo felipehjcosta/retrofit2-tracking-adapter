@@ -8,6 +8,16 @@ A Retrofit 2 adapter for tracking responses.
 Usage
 -----
 
+Annotate the interface with the `Tracking` annotation:
+```kotlin
+interface Endpoint {
+    @GET("/test/1")
+    @Tracking("/test/{id}")
+    fun get(): Call<String>
+}
+```
+
+Create an instance of `TrackingCallAdapterFactory` and add it to Retrofit Builder.
 ```kotlin
 val factory = TrackingCallAdapterFactory {
             object : RetrofitNetworkTracking {
@@ -21,9 +31,31 @@ val factory = TrackingCallAdapterFactory {
             }
         }
 
+val okHttpClient = OkHttpClient.Builder().build()
+
 val retrofit = Retrofit.Builder()
     .baseUrl("https://api.example.com")
+    .client(okHttpClient)
     .addCallAdapterFactory(factory)
+    .build()
+```
+
+You can use the interceptor instead of `TrackingCallAdapterFactory` if you prefer:
+```kotlin
+val interceptor = TrackingRequestInterceptor {
+            object:NetworkRequestTracking {
+                override fun onRequest(request: Request, response: Response, trackingPath: String?) {
+                    // track request and response with path response
+                }
+            }
+        }
+
+val okHttpClient = OkHttpClient.Builder()
+    .addInterceptor(interceptor)
+    .build()
+val retrofit = Retrofit.Builder()
+    .baseUrl("https://api.example.com")
+    .client(okHttpClient)
     .build()
 ```
 
