@@ -71,7 +71,7 @@ or Maven:
 <dependency>
   <groupId>com.github.felipehjcosta</groupId>
   <artifactId>retrofit2-tracking-adapter</artifactId>
-  <version>0.9.0</version>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
