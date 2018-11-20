@@ -1,9 +1,9 @@
-Retrofit 2 Tracking Adapter
+Retrofit 2 Tracking Library
 ==================================
 
 [![Build Status](https://travis-ci.org/felipehjcosta/retrofit2-tracking-adapter.svg?branch=master)](https://travis-ci.org/felipehjcosta/retrofit2-tracking-adapter) [![codecov](https://codecov.io/gh/felipehjcosta/retrofit2-tracking-adapter/branch/master/graph/badge.svg)](https://codecov.io/gh/felipehjcosta/retrofit2-tracking-adapter) [![codebeat badge](https://codebeat.co/badges/fe01dfd5-be8b-4326-b976-09933221c39e)](https://codebeat.co/projects/github-com-felipehjcosta-retrofit2-tracking-adapter-master)
 
-A Retrofit 2 adapter for tracking responses.
+A Retrofit 2 tracking requests library.
 
 Usage
 -----
@@ -43,7 +43,7 @@ val retrofit = Retrofit.Builder()
 You can use the interceptor instead of `TrackingCallAdapterFactory` if you prefer:
 ```kotlin
 val interceptor = TrackingRequestInterceptor {
-            object:NetworkRequestTracking {
+            object : NetworkRequestTracking {
                 override fun onRequest(request: Request, response: Response, trackingPath: String?) {
                     // track request and response with path response
                 }
@@ -64,7 +64,7 @@ Download
 
 Gradle:
 ```groovy
-compile 'com.github.felipehjcosta:retrofit2-tracking-adapter:0.9.0'
+compile 'com.github.felipehjcosta:retrofit2-tracking-adapter:1.0.0'
 ```
 or Maven:
 ```xml
