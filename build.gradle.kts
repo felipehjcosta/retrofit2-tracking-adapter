@@ -33,6 +33,10 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+jacoco {
+    toolVersion = "0.8.2"
+}
+
 tasks.withType<JacocoReport> {
     reports {
         xml.isEnabled = true
