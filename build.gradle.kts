@@ -8,6 +8,7 @@ plugins {
     id("org.mikeneck.junit.starter.normal") version "5.0.2"
     jacoco
     id("com.novoda.bintray-release") version "0.9"
+    id("io.gitlab.arturbosch.detekt") version "1.0.0-RC12"
 }
 
 val kotlinVersion: String? by extra {
@@ -42,6 +43,13 @@ tasks.withType<JacocoReport> {
         xml.isEnabled = true
         html.isEnabled = true
     }
+}
+
+detekt {
+    toolVersion = "1.0.0-RC12"
+    input = files("src/main/kotlin")
+    filters = ".*/resources/.*,.*/build/.*"
+    config = files("${project.rootDir}/default-detekt-config.yml")
 }
 
 configure<PublishExtension> {
