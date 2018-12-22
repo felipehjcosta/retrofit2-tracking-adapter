@@ -10,10 +10,17 @@ cache:
   - "$HOME/.m2"
   - "$HOME/.gradle"
 
-script: gradle/buildViaTravis.sh
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+jobs:
+  include:
+    - stage: lint
+      script: ./gradlew detekt --console=plain
+    - stage: test
+      script: ./gradlew test jacocoJunit5TestReport --console=plain
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+    - stage: deploy
+      script: ./gradlew build bintrayUpload -PbintrayUser="${BINTRAY_USER}" -PbintrayKey="${BINTRAY_PASSWORD}" -PdryRun=false --console=plain
+      if: tag IS present
 
 env:
   global:
