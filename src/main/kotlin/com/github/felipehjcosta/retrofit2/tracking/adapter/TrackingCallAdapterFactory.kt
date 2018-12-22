@@ -1,11 +1,16 @@
 package com.github.felipehjcosta.retrofit2.tracking.adapter
 
-import retrofit2.*
+import retrofit2.Call
+import retrofit2.CallAdapter
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import java.io.IOException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 class TrackingCallAdapterFactory private constructor(
-        private val createTracking: () -> RetrofitNetworkTracking
+    private val createTracking: () -> RetrofitNetworkTracking
 ) : CallAdapter.Factory() {
 
     companion object {
@@ -32,9 +37,9 @@ class TrackingCallAdapterFactory private constructor(
     }
 
     private class TrackingCallAdapter(
-            private val responseType: Type,
-            private val retrofitNetworkTracking: RetrofitNetworkTracking,
-            private val path: String?
+        private val responseType: Type,
+        private val retrofitNetworkTracking: RetrofitNetworkTracking,
+        private val path: String?
 
     ) : CallAdapter<Any, Any> {
         override fun responseType(): Type = responseType
@@ -43,15 +48,15 @@ class TrackingCallAdapterFactory private constructor(
     }
 
     private class TrackingCallDecorator(
-            private val decoratedCall: Call<Any>,
-            private val retrofitNetworkTracking: RetrofitNetworkTracking,
-            private val path: String?
+        private val decoratedCall: Call<Any>,
+        private val retrofitNetworkTracking: RetrofitNetworkTracking,
+        private val path: String?
     ) : Call<Any> by decoratedCall {
 
         override fun execute(): Response<Any> {
             return try {
                 decoratedCall.execute().apply { retrofitNetworkTracking.onSuccess(this, path) }
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 retrofitNetworkTracking.onFailure(e, path)
                 throw e
             }

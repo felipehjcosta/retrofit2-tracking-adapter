@@ -6,13 +6,14 @@ import retrofit2.Invocation
 
 
 class TrackingRequestInterceptor private constructor(
-        private val createTrackingNetworkRequest: () -> NetworkRequestTracking
+    private val createTrackingNetworkRequest: () -> NetworkRequestTracking
 ) : Interceptor {
 
     companion object {
         @JvmStatic
         @JvmName("create")
-        operator fun invoke(createTrackingNetworkRequest: () -> NetworkRequestTracking) = TrackingRequestInterceptor(createTrackingNetworkRequest)
+        operator fun invoke(createTrackingNetworkRequest: () -> NetworkRequestTracking) =
+            TrackingRequestInterceptor(createTrackingNetworkRequest)
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
